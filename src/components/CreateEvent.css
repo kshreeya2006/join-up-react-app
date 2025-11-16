@@ -1,0 +1,40 @@
+.event-create-container {
+  max-width: 450px;
+  margin: 30px auto;
+  padding: 20px;
+  background: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 0 10px #ccc;
+}
+
+.event-form {
+  display: flex;
+  flex-direction: column;
+}
+
+.event-form label {
+  margin-top: 10px;
+  font-weight: bold;
+}
+
+.event-form input {
+  padding: 8px;
+  margin-top: 5px;
+  border-radius: 6px;
+  border: 1px solid #aaa;
+}
+
+.create-btn {
+  margin-top: 20px;
+  padding: 10px;
+  border: none;
+  background: #0a7cff;
+  color: white;
+  font-size: 16px;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.create-btn:hover {
+  background: #005ec9;
+}
