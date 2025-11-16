@@ -7,24 +7,27 @@ import "./Events.css";
 export default function Events() {
   const { user, products: events, setProducts: setEvents } = useContext(AppContext);
   const [loading, setLoading] = useState(true);
-  const [errorMsg, setErrorMsg] = useState("");
+  const [error, setError] = useState(null);
   const API = import.meta.env.VITE_API_URL;
   const navigate = useNavigate();
 
-  // Fetch events from backend
+  // Fetch events safely
   const fetchEvents = async () => {
     setLoading(true);
-    setErrorMsg("");
+    setError(null);
+
     try {
       const token = user?.token || localStorage.getItem("token");
       const res = await axios.get(`${API}/events/all`, {
         headers: { Authorization: `Bearer ${token}` },
       });
+
+      // Ensure res.data is always an array
       setEvents(Array.isArray(res.data) ? res.data : []);
-    } catch (error) {
-      console.error("Error fetching events:", error);
-      setErrorMsg("Failed to fetch events. Please try again later.");
-      setEvents([]);
+    } catch (err) {
+      console.error("Error fetching events:", err);
+      setError("Failed to fetch events. Please try again later.");
+      setEvents([]); // fallback to empty array
     } finally {
       setLoading(false);
     }
@@ -32,9 +35,8 @@ export default function Events() {
 
   useEffect(() => {
     fetchEvents();
-  }, [user]); // refetch if user changes
+  }, []);
 
-  // Handle registration click
   const handleRegister = (event) => {
     if (!user?.email) {
       alert("Please login to register!");
@@ -43,11 +45,10 @@ export default function Events() {
     navigate("/register", { state: { event } });
   };
 
-  // Admin check
   const isAdmin = user?.email === "admin@eventtracker.com";
 
   if (loading) return <p>Loading events...</p>;
-  if (errorMsg) return <p>{errorMsg}</p>;
+  if (error) return <p className="error">{error}</p>;
   if (!Array.isArray(events) || events.length === 0) return <p>No events available.</p>;
 
   return (
@@ -55,10 +56,7 @@ export default function Events() {
       <h3>Welcome {user?.name || "Guest"}!</h3>
 
       {isAdmin && (
-        <button
-          className="add-event-btn"
-          onClick={() => navigate("/create-event")}
-        >
+        <button className="add-event-btn" onClick={() => navigate("/create-event")}>
           + Add Event
         </button>
       )}
@@ -67,17 +65,14 @@ export default function Events() {
         {events.map((event) => (
           <div key={event._id} className="event-card">
             <strong>{event.name || "Unnamed Event"}</strong>
-            <p>📍 {event.venue || "N/A"}</p>
-            <p>📅 {event.date || "TBD"}</p>
+            <p>📍 {event.venue || "Venue not specified"}</p>
+            <p>📅 {event.date || "Date not specified"}</p>
             <p>🏆 Prize: {event.prize || "N/A"}</p>
             <p>💰 Registration: ₹{event.regAmount ?? "N/A"}</p>
             <p>👥 Max Team Size: {event.teamSize ?? "N/A"}</p>
             <p>📞 Organiser: {event.contact || "N/A"}</p>
 
-            <button
-              className="register-btn"
-              onClick={() => handleRegister(event)}
-            >
+            <button className="register-btn" onClick={() => handleRegister(event)}>
               Register
             </button>
           </div>
