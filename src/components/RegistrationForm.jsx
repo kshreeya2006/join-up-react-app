@@ -1,56 +1,46 @@
 import React, { useState, useContext } from "react";
 import { AppContext } from "../App";
-import { useLocation, useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import axios from "axios";
-import "./RegisterForm.css"; // create a CSS file later
+import "./RegisterForm.css";
 
 export default function RegistrationForm() {
   const { user } = useContext(AppContext);
   const navigate = useNavigate();
-  const API = import.meta.env.VITE_API_URL;
-
-  // event data sent through navigation state
   const { state } = useLocation();
   const event = state?.event;
+  const API = import.meta.env.VITE_API_URL;
 
-  // form state
   const [phone, setPhone] = useState("");
   const [teamSize, setTeamSize] = useState(event?.teamSize || 1);
   const [teamMembers, setTeamMembers] = useState([]);
 
-  // Add team member field
   const addMember = () => {
-    if (teamMembers.length < teamSize - 1) {
+    if (teamMembers.length < (teamSize - 1)) {
       setTeamMembers([...teamMembers, ""]);
     }
   };
 
-  // Update specific team member name
   const updateMember = (index, value) => {
     const updated = [...teamMembers];
     updated[index] = value;
     setTeamMembers(updated);
   };
 
-  // Submit registration
   const handleSubmit = async () => {
-    if (!phone.trim()) {
-      alert("Phone number is required");
-      return;
-    }
+    if (!user) return alert("Please login first!");
+    if (!event) return alert("No event selected!");
+    if (!phone.trim()) return alert("Phone number is required!");
 
     try {
-      const url = `${API}/registrations/new`;
-
-      await axios.post(url, {
+      await axios.post(`${API}/registrations/new`, {
         userEmail: user.email,
         eventId: event._id,
         phone,
         teamSize,
         teamMembers,
       });
-
-      alert("Registration Successful!");
+      alert("Registration successful!");
       navigate("/events");
     } catch (error) {
       console.error("Registration failed:", error);
@@ -58,52 +48,26 @@ export default function RegistrationForm() {
     }
   };
 
-  if (!user) return <h2>Please log in to register.</h2>;
-  if (!event) return <h2>No event selected.</h2>;
+  if (!user) return <p>Please log in to register.</p>;
+  if (!event) return <p>No event selected.</p>;
 
   return (
     <div className="reg-container">
       <h2>Register for {event.name}</h2>
-
       <label>Phone Number:</label>
-      <input
-        type="text"
-        value={phone}
-        onChange={(e) => setPhone(e.target.value)}
-        placeholder="Enter your phone number"
-      />
+      <input type="text" value={phone} onChange={(e) => setPhone(e.target.value)} placeholder="Enter your phone" />
 
       <label>Team Size (max {event.teamSize}):</label>
-      <input
-        type="number"
-        min="1"
-        max={event.teamSize}
-        value={teamSize}
-        onChange={(e) => {
-          setTeamSize(Number(e.target.value));
-          setTeamMembers([]); // reset when size changed
-        }}
-      />
+      <input type="number" min="1" max={event.teamSize} value={teamSize} onChange={(e) => { setTeamSize(Number(e.target.value)); setTeamMembers([]); }} />
 
       <h4>Team Members (excluding you):</h4>
-      {teamMembers.map((member, index) => (
-        <input
-          key={index}
-          type="text"
-          value={member}
-          onChange={(e) => updateMember(index, e.target.value)}
-          placeholder={`Member ${index + 2} Name`}
-        />
+      {teamMembers.map((member, idx) => (
+        <input key={idx} type="text" value={member} placeholder={`Member ${idx + 2}`} onChange={(e) => updateMember(idx, e.target.value)} />
       ))}
 
-      {teamMembers.length < teamSize - 1 && (
-        <button onClick={addMember}>Add Team Member</button>
-      )}
-
+      {teamMembers.length < (teamSize - 1) && <button onClick={addMember}>Add Team Member</button>}
       <br />
-      <button className="submit-btn" onClick={handleSubmit}>
-        Submit Registration
-      </button>
+      <button onClick={handleSubmit}>Submit Registration</button>
     </div>
   );
 }
