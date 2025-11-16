@@ -37,7 +37,7 @@ export default function Events() {
     navigate("/register", { state: { event } });
   };
 
-  const isAdmin = user?.email === "admin@gmail.com";
+  const isAdmin = user?.email === "admin@eventtracker.com";
 
   if (loading) return <p>Loading events...</p>;
   if (!events || events.length === 0) return <p>No events available.</p>;
