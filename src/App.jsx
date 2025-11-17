@@ -8,7 +8,7 @@ import Logout from "./components/Logout";
 import Header from "./components/Header";
 import Footer from "./components/Footer";
 import RegisteredEvents from "./components/RegisteredEvents";
-import CreateEvent from "./components/CreateEvent"; // new page
+import CreateEvent from "./components/CreateEvent";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 
 export const AppContext = createContext();
@@ -17,11 +17,14 @@ function App() {
   const [users, setUsers] = useState([]);
   const [user, setUser] = useState({});
   const [events, setEvents] = useState([]);
-  const [cart, setCart] = useState({}); // still needed for RegistrationForm team members state
 
   return (
     <AppContext.Provider
-      value={{ users, setUsers, user, setUser, events, setEvents, cart, setCart }}
+      value={{ 
+        users, setUsers, 
+        user, setUser, 
+        events, setEvents 
+      }}
     >
       <BrowserRouter>
         <Header />
